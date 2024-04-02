@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 public class ItemController {
     private final ItemService service;
-    private final String USER_ID_HEADER = "X-Sharer-User-Id";
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     public OutgoingItemDto createItem(
