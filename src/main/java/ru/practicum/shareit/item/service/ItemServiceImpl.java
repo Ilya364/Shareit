@@ -2,12 +2,14 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.IsNotOwnerException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.IncomingItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +31,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item updateItem(ItemDto itemDto, Long id) {
-        return repository.updateItem(itemDto, id);
+    public Item updateItem(IncomingItemDto incomingItemDto, Long id, Long userId) {
+        Item item = getItemById(id);
+        if (!Objects.equals(item.getOwner(), userId)) {
+            throw new IsNotOwnerException("User " + id + " is not owner of Item " + item.getId() + ".");
+        }
+        return repository.updateItem(incomingItemDto, id);
     }
 
     @Override

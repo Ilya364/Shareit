@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.repository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.IncomingItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoMapper;
 import ru.practicum.shareit.item.model.Item;
 import java.util.*;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @Repository
 @Slf4j
 public class InMemoryItemRepository implements ItemRepository {
-    private Map<Long, Item> items = new HashMap<>();
+    private final Map<Long, Item> items = new HashMap<>();
     private Long nextId = 1L;
 
     @Override
@@ -35,9 +35,9 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public Item updateItem(ItemDto itemDto, Long id) {
+    public Item updateItem(IncomingItemDto incomingItemDto, Long id) {
         Item item = items.get(id);
-        ItemDtoMapper.partialMapToItem(itemDto, item);
+        ItemDtoMapper.partialMapToItem(incomingItemDto, item);
         log.info("Item {} is updated.", id);
         return getItemById(id);
     }
@@ -60,7 +60,7 @@ public class InMemoryItemRepository implements ItemRepository {
     @Override
     public List<Item> search(String text) {
         return items.values().stream()
-                .filter(item -> containsTextCaseInsensitive(item, text) && item.getAvailable())
+                .filter(item -> item.getAvailable() && containsTextCaseInsensitive(item, text))
                 .collect(Collectors.toList());
     }
 

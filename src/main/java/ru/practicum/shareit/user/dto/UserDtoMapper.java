@@ -1,35 +1,37 @@
 package ru.practicum.shareit.user.dto;
 
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.user.model.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@UtilityClass
 public class UserDtoMapper {
-    public static UserDto mapToUserDto(User user) {
-        return new UserDto(
-                user.getId(),
-                user.getName(),
-                user.getEmail()
-        );
+    public OutgoingUserDto toOutgoingDto(User user) {
+        return OutgoingUserDto.builder()
+            .id(user.getId())
+            .name(user.getName())
+            .email(user.getEmail())
+            .build();
     }
 
-    public static User mapToUser(UserDto userDto) {
-        return new User(
-                userDto.getId(),
-                userDto.getName(),
-                userDto.getEmail()
-        );
+    public User toUser(IncomingUserDto dto) {
+        return User.builder()
+            .id(dto.getId())
+            .name(dto.getName())
+            .email(dto.getEmail())
+            .build();
     }
 
-    public static List<UserDto> mapToUserDtoList(List<User> users) {
+    public List<OutgoingUserDto> toOutgoingDtoList(List<User> users) {
         return users.stream()
-                .map(UserDtoMapper::mapToUserDto)
+                .map(UserDtoMapper::toOutgoingDto)
                 .collect(Collectors.toList());
     }
 
-    public static List<User> mapToUserList(List<UserDto> userDtos) {
-        return userDtos.stream()
-                .map(UserDtoMapper::mapToUser)
+    public List<User> toUserList(List<IncomingUserDto> incomingUserDtos) {
+        return incomingUserDtos.stream()
+                .map(UserDtoMapper::toUser)
                 .collect(Collectors.toList());
     }
 }

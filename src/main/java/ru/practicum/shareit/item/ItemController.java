@@ -1,64 +1,65 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exception.IsNotOwnerException;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.IncomingItemDto;
 import static ru.practicum.shareit.item.dto.ItemDtoMapper.*;
+import ru.practicum.shareit.item.dto.OutgoingItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Objects;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
+@Slf4j
 public class ItemController {
     private final ItemService service;
+    private final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto createItem(
-            @Valid @RequestBody ItemDto itemDto,
-            @RequestHeader("X-Sharer-User-Id") Long owner
+    public OutgoingItemDto createItem(
+            @Valid @RequestBody IncomingItemDto incomingItemDto,
+            @RequestHeader(USER_ID_HEADER) Long owner
     ) {
-        Item item = service.createItem(mapToItem(itemDto), owner);
-        return mapToItemDto(item);
+        log.info("Request to create item.");
+        Item item = service.createItem(toItem(incomingItemDto), owner);
+        return toOutgoingDto(item);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(
-            @RequestBody ItemDto itemDto,
+    public OutgoingItemDto updateItem(
+            @RequestBody IncomingItemDto incomingItemDto,
             @PathVariable Long itemId,
-            @RequestHeader("X-Sharer-User-Id") Long user
+            @RequestHeader(USER_ID_HEADER) Long user
     ) {
-        Item item = service.getItemById(itemId);
-        if (!Objects.equals(item.getOwner(), user)) {
-            throw new IsNotOwnerException("User " + user + " is not owner of Item " + item.getId() + ".");
-        }
-        return mapToItemDto(service.updateItem(itemDto, itemId));
+        log.info("Request to update item {}.", itemId);
+        return toOutgoingDto(service.updateItem(incomingItemDto, itemId, user));
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId) {
-        return mapToItemDto(service.getItemById(itemId));
+    public OutgoingItemDto getItemById(@PathVariable Long itemId) {
+        log.info("Request to get item {}.", itemId);
+        return toOutgoingDto(service.getItemById(itemId));
     }
 
     @DeleteMapping("/{itemId}")
     public void deleteItemById(@PathVariable Long itemId) {
+        log.info("Request to delete item {}.", itemId);
         service.deleteItemById(itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getUserItems(@RequestHeader("X-Sharer-User-Id") Long owner) {
-        return mapToItemDtoList(service.getUserItems(owner));
+    public List<OutgoingItemDto> getUserItems(@RequestHeader(USER_ID_HEADER) Long owner) {
+        log.info("Request to receive user {}' items.", owner);
+        return toOutgoingDtoList(service.getUserItems(owner));
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
-        return mapToItemDtoList(service.search(text));
+    public List<OutgoingItemDto> search(@RequestParam String text) {
+        log.info("Request to search items by \"{}\".", text);
+        return toOutgoingDtoList(service.search(text));
     }
 }

@@ -1,60 +1,60 @@
 package ru.practicum.shareit.item.dto;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+@UtilityClass
 public class ItemDtoMapper {
-    public static ItemDto mapToItemDto(Item item) {
-        return new ItemDto(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getAvailable()
-        );
+    public OutgoingItemDto toOutgoingDto(Item item) {
+        return OutgoingItemDto.builder()
+            .id(item.getId())
+            .name(item.getName())
+            .description(item.getDescription())
+            .available(item.getAvailable())
+            .build();
     }
 
-    public static Item mapToItem(ItemDto itemDto) {
-        return new Item(
-                itemDto.getId(),
-                itemDto.getName(),
-                itemDto.getDescription(),
-                itemDto.getAvailable()
-        );
+    public Item toItem(IncomingItemDto dto) {
+        return Item.builder()
+            .id(dto.getId())
+            .name(dto.getName())
+            .description(dto.getDescription())
+            .available(dto.getAvailable())
+            .build();
     }
 
-    public static void partialMapToItem(ItemDto itemDto, Item item) {
-        if (itemDto.getName() != null) {
-            if (!itemDto.getName().isEmpty()) {
-                item.setName(itemDto.getName());
+    public void partialMapToItem(IncomingItemDto dto, Item item) {
+        if (dto.getName() != null) {
+            if (!dto.getName().isEmpty()) {
+                item.setName(dto.getName());
             } else {
                 throw new ValidationException("Name can't be empty.");
             }
         }
-        if (itemDto.getDescription() != null) {
-            if (!itemDto.getDescription().isEmpty()) {
-                item.setDescription(itemDto.getDescription());
+        if (dto.getDescription() != null) {
+            if (!dto.getDescription().isEmpty()) {
+                item.setDescription(dto.getDescription());
             } else {
                 throw new ValidationException("Description can't be empty.");
             }
         }
-        if (itemDto.getAvailable() != null) {
-            item.setAvailable(itemDto.getAvailable());
+        if (dto.getAvailable() != null) {
+            item.setAvailable(dto.getAvailable());
         }
     }
 
-    public static List<ItemDto> mapToItemDtoList(List<Item> items) {
+    public List<OutgoingItemDto> toOutgoingDtoList(List<Item> items) {
         return items.stream()
-                .map(ItemDtoMapper::mapToItemDto)
+                .map(ItemDtoMapper::toOutgoingDto)
                 .collect(Collectors.toList());
     }
 
-    public static List<Item> mapToItemList(List<ItemDto> itemDtos) {
-        return itemDtos.stream()
-                .map(ItemDtoMapper::mapToItem)
+    public List<Item> toItemList(List<IncomingItemDto> dtos) {
+        return dtos.stream()
+                .map(ItemDtoMapper::toItem)
                 .collect(Collectors.toList());
     }
 }

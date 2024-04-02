@@ -51,7 +51,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleInternalError(final Exception e) {
+    public Map<String, String> handleInternalError(final Throwable e) {
         log.error("Internal server error: " + e.getMessage());
         System.out.println(Arrays.toString(e.getStackTrace()));
         return Map.of("Internal server error:", e.getMessage());
