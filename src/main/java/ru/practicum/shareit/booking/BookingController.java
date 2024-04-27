@@ -5,21 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.IncomingBookingDto;
 import ru.practicum.shareit.booking.dto.OutgoingBookingDto;
-import static ru.practicum.shareit.booking.dto.BookingDtoMapper.*;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.exception.ItemNotAvailableException;
 import ru.practicum.shareit.exception.UnsupportedStateException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserService;
 import javax.validation.Valid;
 import java.util.List;
+import static ru.practicum.shareit.booking.dto.BookingDtoMapper.*;
 
-/**
- * TODO Sprint add-bookings.
- */
 @Slf4j
 @RestController
 @RequestMapping(path = "/bookings")
@@ -27,7 +21,6 @@ import java.util.List;
 public class BookingController {
     private final BookingService bookingService;
     private final ItemService itemService;
-    private final UserService userService;
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
@@ -36,14 +29,8 @@ public class BookingController {
         @RequestHeader(USER_ID_HEADER) Long user
     ) {
         log.info("Request to create Booking.");
-        User booker;
-        booker = userService.getUserById(user);
         Item item = itemService.getItem(incomingBookingDto.getItemId());
-        if (!item.getAvailable()) {
-            throw new ItemNotAvailableException("Item not available.");
-        }
         Booking booking = toBooking(incomingBookingDto);
-        booking.setBooker(booker);
         booking.setItem(item);
         return toOutgoingDto(bookingService.createBooking(booking, user));
     }

@@ -1,9 +1,7 @@
 package ru.practicum.shareit.user.dto;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.comment.dto.IncomingCommentDto;
 import ru.practicum.shareit.user.model.User;
-
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;

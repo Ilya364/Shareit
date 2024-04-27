@@ -4,18 +4,18 @@ import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.ValidationException;
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @UtilityClass
 public class BookingDtoMapper {
-    public boolean isEndAfterStart(LocalDateTime start, LocalDateTime end) {
-        if (start != null && end != null) {
-            return end.isAfter(start);
+    private boolean isEndAfterStart(LocalDateTime start, LocalDateTime end) {
+        boolean isAfter = end.isAfter(start);
+        if (isAfter) {
+            return true;
         } else {
-            throw new ValidationException("End or start null");
+            throw new ValidationException("The end should be after start.");
         }
     }
 
@@ -42,9 +42,7 @@ public class BookingDtoMapper {
     }
 
     public Booking toBooking(IncomingBookingDto dto) {
-        if (!isEndAfterStart(dto.getStart(), dto.getEnd())) {
-            throw new ValidationException("Start after end.");
-        }
+        isEndAfterStart(dto.getStart(), dto.getEnd());
         return Booking.builder()
             .status(Status.WAITING)
             .start(dto.getStart())
@@ -68,18 +66,5 @@ public class BookingDtoMapper {
         return dtos.stream()
             .map(BookingDtoMapper::toBooking)
             .collect(Collectors.toList());
-    }
-
-    public void partialUpdateBooking(IncomingBookingDto dto, Booking booking) {
-        Field[] dtoFields = dto.getClass().getDeclaredFields();
-        Class userClass = booking.getClass();
-        for (Field field: dtoFields) {
-            try {
-                field.setAccessible(true);
-                userClass.getDeclaredField(field.getName()).set(booking, field.get(dto));
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 }

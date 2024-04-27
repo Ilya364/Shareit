@@ -8,17 +8,15 @@ import ru.practicum.shareit.comment.dto.OutgoingCommentDto;
 import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.IncomingItemDto;
-import static ru.practicum.shareit.item.dto.ItemDtoMapper.*;
 import ru.practicum.shareit.item.dto.OutgoingItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserService;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import static ru.practicum.shareit.comment.dto.CommentDtoMapper.*;
+import static ru.practicum.shareit.item.dto.ItemDtoMapper.*;
 
 @RestController
 @RequestMapping("/items")
@@ -26,7 +24,6 @@ import static ru.practicum.shareit.comment.dto.CommentDtoMapper.*;
 @Slf4j
 public class ItemController {
     private final ItemService itemService;
-    private final UserService userService;
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
@@ -65,7 +62,7 @@ public class ItemController {
         @RequestHeader(USER_ID_HEADER) Long user
     ) {
         log.info("Request to get item {}.", itemId);
-        return itemService.getItemWithCommentsAndBookingsById(itemId, user);
+        return itemService.getItemById(itemId, user);
     }
 
     @DeleteMapping("/{itemId}")
@@ -95,9 +92,7 @@ public class ItemController {
         try {
             incomingCommentDto.setCreated(LocalDateTime.now());
             log.info("Request to create comment.");
-            User user = userService.getUserById(userId);
             Comment comment = toComment(incomingCommentDto);
-            comment.setUser(user);
             return toOutgoingDto(itemService.createComment(comment, itemId, userId));
         } catch (NoSuchElementException e) {
             throw new NotFoundException("User not found.");

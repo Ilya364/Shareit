@@ -3,9 +3,7 @@ package ru.practicum.shareit.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.user.UserController;
@@ -24,7 +22,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public Map<String, String> handleNotOwnerException(final BookingNoAccessException e) {
+    public Map<String, String> handleNoAccessException(final BookingNoAccessException e) {
         log.error("A request from a non-owner user: " + e.getMessage());
         return Map.of("A request from a non-owner user:", e.getMessage());
     }
