@@ -8,7 +8,7 @@ import java.util.List;
 public interface ItemService {
     Item createItem(Item item, Long owner);
 
-    OutgoingItemDto getItemWithCommentsAndBookingsById(Long id, Long user);
+    OutgoingItemDto getItemById(Long id, Long user);
 
     Item getItem(Long id);
 

@@ -11,9 +11,13 @@ import java.util.List;
 
 @Primary
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findAllByBooker(User booker); //TODO - 1.Как-то проверку на время бронирования
-    List<Booking> findAllByBookerAndStatus(User booker, Status status);
-    List<Booking> findAllByItemOwner(User itemOwner); //TODO - 2.Как-то проверку на время бронирования
-    List<Booking> findAllByItemOwnerAndStatus(User itemOwner, Status status);
+    List<Booking> findAllByBookerOrderByStartDesc(User booker);
+
+    List<Booking> findAllByBookerAndStatusOrderByStartDesc(User booker, Status status);
+
+    List<Booking> findAllByItemOwnerOrderByStartDesc(User itemOwner);
+
+    List<Booking> findAllByItemOwnerAndStatusOrderByStartDesc(User itemOwner, Status status);
+
     List<Booking> findAllByItemInOrderByStart(List<Item> items);
 }
