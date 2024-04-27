@@ -1,7 +1,10 @@
 package ru.practicum.shareit.user.dto;
 
 import lombok.experimental.UtilityClass;
+import ru.practicum.shareit.comment.dto.IncomingCommentDto;
 import ru.practicum.shareit.user.model.User;
+
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,5 +36,23 @@ public class UserDtoMapper {
         return incomingUserDtos.stream()
                 .map(UserDtoMapper::toUser)
                 .collect(Collectors.toList());
+    }
+
+    public void partialUpdateUser(IncomingUserDto dto, User user) {
+        Field[] dtoFields = dto.getClass().getDeclaredFields();
+        Class<? extends User> userClass = user.getClass();
+        for (Field dtoField: dtoFields) {
+            dtoField.setAccessible(true);
+            try {
+                if (dtoField.get(dto) == null) {
+                    continue;
+                }
+                Field userField = userClass.getDeclaredField(dtoField.getName());
+                userField.setAccessible(true);
+                userField.set(user, dtoField.get(dto));
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

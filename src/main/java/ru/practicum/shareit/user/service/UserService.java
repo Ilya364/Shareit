@@ -8,7 +8,7 @@ public interface UserService {
 
     User getUserById(Long id);
 
-    User updateUser(User user, Long id);
+    User updateUser(User user);
 
     void deleteUserById(Long id);
 

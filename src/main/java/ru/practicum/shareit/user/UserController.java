@@ -31,7 +31,9 @@ public class UserController {
             @PathVariable Long userId
     ) {
         log.info("Request to update user {}.", userId);
-        User user = service.updateUser(toUser(incomingUserDto), userId);
+        User user = service.getUserById(userId);
+        partialUpdateUser(incomingUserDto, user);
+        service.updateUser(user);
         return toOutgoingDto(user);
     }
 

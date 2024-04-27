@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.dto;
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
+
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +29,7 @@ public class ItemDtoMapper {
     }
 
     public void partialMapToItem(IncomingItemDto dto, Item item) {
-        if (dto.getName() != null) {
+/*        if (dto.getName() != null) {
             if (!dto.getName().isEmpty()) {
                 item.setName(dto.getName());
             } else {
@@ -43,6 +45,30 @@ public class ItemDtoMapper {
         }
         if (dto.getAvailable() != null) {
             item.setAvailable(dto.getAvailable());
+        }*/
+
+        Field[] dtoFields = dto.getClass().getDeclaredFields();
+        Class<? extends Item> itemClass = item.getClass();
+        for (Field dtoField: dtoFields) {
+            dtoField.setAccessible(true);
+            try {
+                if (dtoField.get(dto) == null) {
+                    continue;
+                }
+                String fieldName = dtoField.getName();
+                if (fieldName.equals("name") || fieldName.equals("description")) {
+                    String fieldValue = (String)dtoField.get(dto);
+                    if (fieldValue.isEmpty()) {
+                        throw new ValidationException(fieldName + " can't be empty.");
+                    }
+                }
+
+                Field itemField = itemClass.getDeclaredField(fieldName);
+                itemField.setAccessible(true);
+                itemField.set(item, dtoField.get(dto));
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
