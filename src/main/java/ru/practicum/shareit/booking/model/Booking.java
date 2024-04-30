@@ -21,9 +21,9 @@ public class Booking {
     private LocalDateTime start;
     @Column(name = "end_date")
     private LocalDateTime end;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private Item item;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private User booker;
     @Enumerated(EnumType.STRING)
     private Status status;

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.Status;
@@ -16,7 +17,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -26,6 +26,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final Sort byStartDescSorting = Sort.by(Sort.Direction.DESC, "start");
 
     private Booking getBookingIfUserHasAccess(Long bookingId, Long userId) {
         Booking booking;
@@ -43,7 +44,7 @@ public class BookingServiceImpl implements BookingService {
         if (isUserBooker) {
             return booking;
         } else {
-            throw new NotFoundException("User " + userId + " is not booker of booking " + bookingId + ".");
+            throw new NotFoundException(String.format("User %d is not booker of booking %d.", userId, bookingId));
         }
     }
 
@@ -53,16 +54,16 @@ public class BookingServiceImpl implements BookingService {
         if (isUserItemOwner) {
             return booking;
         } else {
-            throw new NotFoundException("User " + userId + " is not owner of item " + booking.getItem().getId() + ".");
+            throw new NotFoundException(
+                String.format("User %d is not owner of item %d.", userId, booking.getItem().getId())
+            );
         }
     }
 
     private Booking getBookingById(Long bookingId) {
-        try {
-            return bookingRepository.findById(bookingId).orElseThrow();
-        } catch (NoSuchElementException e) {
-            throw new NotFoundException("Booking " + bookingId + " is not found.");
-        }
+        return bookingRepository.findById(bookingId).orElseThrow(
+            () -> new NotFoundException(String.format("Booking %d is not found.", bookingId))
+        );
     }
 
     private boolean isBookingApproved(Booking booking) {
@@ -70,31 +71,28 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private User getUserById(Long userId) {
-        try {
-            return userRepository.findById(userId).orElseThrow();
-        } catch (NoSuchElementException e) {
-            throw new WrongUserIdException("User " + userId + " is not exist.");
-        }
+        return userRepository.findById(userId).orElseThrow(
+            () -> new WrongUserIdException(String.format("User %d is not exist.", userId))
+        );
     }
 
     private Item getItemById(Long itemId) {
-        try {
-            return itemRepository.findById(itemId).orElseThrow();
-        } catch (NoSuchElementException e) {
-            throw new WrongUserIdException("Item " + itemId + " is not exist.");
-        }
+        return itemRepository.findById(itemId).orElseThrow(
+            () -> new WrongUserIdException(String.format("Item %d is not exist.", itemId))
+        );
     }
 
     private Predicate<Booking> getFilterByState(State state) {
         switch (state) {
             case PAST:
-                return booking -> booking.getEnd().isBefore(LocalDateTime.now());
+                return booking ->
+                    booking.getEnd().isBefore(LocalDateTime.now());
             case CURRENT:
                 return booking ->
                     booking.getStart().isBefore(LocalDateTime.now()) && booking.getEnd().isAfter(LocalDateTime.now());
-
             case FUTURE:
-                return booking -> booking.getStart().isAfter(LocalDateTime.now());
+                return booking ->
+                    booking.getStart().isAfter(LocalDateTime.now());
             default:
                 throw new RuntimeException();
         }
@@ -107,7 +105,7 @@ public class BookingServiceImpl implements BookingService {
         if (item.getOwner().getId().equals(bookerId)) {
             throw new NotFoundException("Booker can't be an item owner.");
         } else if (!item.getAvailable()) {
-            throw new ValidationException("Item " + item.getId() + " is unavailable.");
+            throw new ValidationException(String.format("Item %d is unavailable.", item.getId()));
         }
         booking.setItem(item);
         booking.setBooker(user);
@@ -130,13 +128,13 @@ public class BookingServiceImpl implements BookingService {
         User booker = getUserById(bookerId);
         List<Booking> bookings;
         if (state.equals(State.ALL)) {
-            bookings = new ArrayList<>(bookingRepository.findAllByBookerOrderByStartDesc(booker));
+            bookings = new ArrayList<>(bookingRepository.findAllByBooker(booker, byStartDescSorting));
         } else {
             try {
                 Status status = Status.valueOf(state.name());
-                bookings = bookingRepository.findAllByBookerAndStatusOrderByStartDesc(booker, status);
+                bookings = bookingRepository.findAllByBookerAndStatus(booker, status, byStartDescSorting);
             } catch (IllegalArgumentException e) {
-                bookings = bookingRepository.findAllByBookerOrderByStartDesc(booker).stream()
+                bookings = bookingRepository.findAllByBooker(booker, byStartDescSorting).stream()
                     .filter(getFilterByState(state))
                     .collect(Collectors.toList());
             }
@@ -149,13 +147,13 @@ public class BookingServiceImpl implements BookingService {
         User itemOwner = getUserById(itemOwnerId);
         List<Booking> bookings;
         if (state.equals(State.ALL)) {
-            bookings = new ArrayList<>(bookingRepository.findAllByItemOwnerOrderByStartDesc(itemOwner));
+            bookings = new ArrayList<>(bookingRepository.findAllByItemOwner(itemOwner, byStartDescSorting));
         } else {
             try {
                 Status status = Status.valueOf(state.name());
-                bookings = bookingRepository.findAllByItemOwnerAndStatusOrderByStartDesc(itemOwner, status);
+                bookings = bookingRepository.findAllByItemOwnerAndStatus(itemOwner, status, byStartDescSorting);
             } catch (IllegalArgumentException e) {
-                bookings = bookingRepository.findAllByItemOwnerOrderByStartDesc(itemOwner).stream()
+                bookings = bookingRepository.findAllByItemOwner(itemOwner, byStartDescSorting).stream()
                     .filter(getFilterByState(state))
                     .collect(Collectors.toList());
             }
@@ -167,7 +165,7 @@ public class BookingServiceImpl implements BookingService {
     public Booking approveBooking(Long bookingId, Long itemOwnerId) {
         Booking booking = isItemOwner(itemOwnerId, bookingId);
         if (isBookingApproved(booking)) {
-            throw new ValidationException("Booking " + bookingId + " is already approved.");
+            throw new ValidationException(String.format("Booking %d is already approved.", bookingId));
         }
         booking.setStatus(Status.APPROVED);
         return bookingRepository.save(booking);
@@ -177,7 +175,7 @@ public class BookingServiceImpl implements BookingService {
     public Booking rejectBooking(Long bookingId, Long itemOwnerId) {
         Booking booking = isItemOwner(itemOwnerId, bookingId);
         if (isBookingApproved(booking)) {
-            throw new ValidationException("Booking " + bookingId + " is already approved.");
+            throw new ValidationException(String.format("Booking %d is already approved.", bookingId));
         }
         booking.setStatus(Status.REJECTED);
         return bookingRepository.save(booking);

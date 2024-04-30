@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import javax.persistence.*;
@@ -24,7 +25,8 @@ public class Comment {
     private Item item;
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
-    private LocalDateTime created = LocalDateTime.now();
+    @CreationTimestamp
+    private LocalDateTime created;
     @Column(name = "author_name")
     private String authorName;
 }

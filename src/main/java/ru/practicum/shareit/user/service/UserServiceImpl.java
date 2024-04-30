@@ -20,16 +20,16 @@ public class UserServiceImpl implements UserService {
         try {
             return repository.save(user);
         } catch (ConstraintViolationException e) {
-            throw new NonUniqueEmailException("Email " + user.getEmail() + " is not unique.");
+            throw new NonUniqueEmailException(String.format("Email %s is not unique.", user.getEmail()));
         }
     }
 
     @Override
-    public User getUserById(Long id) {
+    public User getUserById(Long userId) {
         try {
-            return repository.findById(id).orElseThrow();
+            return repository.findById(userId).orElseThrow();
         } catch (NoSuchElementException e) {
-            throw new NotFoundException("User " + id + " not found.");
+            throw new NotFoundException(String.format("User %d is not found", userId));
         }
     }
 
