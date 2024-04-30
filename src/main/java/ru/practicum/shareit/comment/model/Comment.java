@@ -21,9 +21,9 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String text;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private Item item;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private User user;
     @CreationTimestamp
     private LocalDateTime created;

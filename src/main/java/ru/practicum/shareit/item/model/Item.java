@@ -20,6 +20,6 @@ public class Item {
     private String name;
     private String description;
     private Boolean available;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private User owner;
 }
