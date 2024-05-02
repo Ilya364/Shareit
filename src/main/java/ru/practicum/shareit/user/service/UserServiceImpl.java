@@ -2,9 +2,13 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.NonUniqueEmailException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import javax.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -13,26 +17,34 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-        return repository.createUser(user);
+        try {
+            return repository.save(user);
+        } catch (ConstraintViolationException e) {
+            throw new NonUniqueEmailException(String.format("Email %s is not unique.", user.getEmail()));
+        }
     }
 
     @Override
-    public User getUserById(Long id) {
-        return repository.getUserById(id);
+    public User getUserById(Long userId) {
+        try {
+            return repository.findById(userId).orElseThrow();
+        } catch (NoSuchElementException e) {
+            throw new NotFoundException(String.format("User %d is not found", userId));
+        }
     }
 
     @Override
-    public User updateUser(User user, Long id) {
-        return repository.updateUser(user, id);
+    public User updateUser(User user) {
+        return repository.save(user);
     }
 
     @Override
     public void deleteUserById(Long id) {
-        repository.deleteUserById(id);
+        repository.deleteById(id);
     }
 
     @Override
     public List<User> getAllUsers() {
-        return repository.getAllUsers();
+        return repository.findAll();
     }
 }

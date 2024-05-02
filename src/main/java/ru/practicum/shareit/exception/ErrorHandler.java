@@ -3,15 +3,14 @@ package ru.practicum.shareit.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.user.UserController;
 import java.util.Arrays;
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes = {ItemController.class, UserController.class})
+@RestControllerAdvice(assignableTypes = {ItemController.class, UserController.class, BookingController.class})
 @Slf4j
 public class ErrorHandler {
     @ExceptionHandler
@@ -23,14 +22,14 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public Map<String, String> handleNotOwnerException(final IsNotOwnerException e) {
+    public Map<String, String> handleNoAccessException(final BookingNoAccessException e) {
         log.error("A request from a non-owner user: " + e.getMessage());
         return Map.of("A request from a non-owner user:", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationException(final MethodArgumentNotValidException e) {
+    public Map<String, String> handleArgumentNotValidException(final MethodArgumentNotValidException e) {
         log.error("The request was not validated: " + e.getMessage());
         return Map.of("The request was not validated:", e.getMessage());
     }
@@ -40,6 +39,20 @@ public class ErrorHandler {
     public Map<String, String> handleValidationException(final ValidationException e) {
         log.error("The request was not validated: " + e.getMessage());
         return Map.of("The request was not validated:", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleItemNotAvailableException(final ItemNotAvailableException e) {
+        log.error("Item not available: " + e.getMessage());
+        return Map.of("Item not available:", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleUnsupportedException(final UnsupportedStateException e) {
+        log.error("Unknown state: " + e.getMessage());
+        return Map.of("error", "Unknown state: " + e.getMessage());
     }
 
     @ExceptionHandler

@@ -15,4 +15,5 @@ public class IncomingItemDto {
     private final String description;
     @NotNull
     private Boolean available;
+    private Long owner;
 }
