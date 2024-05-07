@@ -22,19 +22,19 @@ public class CommentRepositoryTest {
     private UserRepository userRepository;
     @Autowired
     private ItemRepository itemRepository;
-    private User user = User.builder()
+    private final User user = User.builder()
         .id(1L)
         .name("name")
         .email("ilya@mail.ru")
         .build();
-    private Item item = Item.builder()
+    private final Item item = Item.builder()
         .id(1L)
         .name("name")
         .description("description")
         .owner(user)
         .available(true)
         .build();
-    private Comment comment = Comment.builder()
+    private final Comment comment = Comment.builder()
         .id(1L)
         .text("text")
         .created(LocalDateTime.now())

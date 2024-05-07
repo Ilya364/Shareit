@@ -13,8 +13,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
-import ru.practicum.shareit.request.service.ItemRequestService;
-
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;

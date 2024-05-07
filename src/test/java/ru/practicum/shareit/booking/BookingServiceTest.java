@@ -114,9 +114,7 @@ public class BookingServiceTest {
 
         WrongUserIdException e = assertThrows(
             WrongUserIdException.class,
-            () -> {
-                bookingService.createBooking(forCreate, 2L);
-            }
+            () -> bookingService.createBooking(forCreate, 2L)
         );
         assertEquals("Item 3 is not exist.", e.getMessage());
     }
@@ -137,9 +135,7 @@ public class BookingServiceTest {
 
         ValidationException e = assertThrows(
             ValidationException.class,
-            () -> {
-                bookingService.createBooking(forCreate, 2L);
-            }
+            () -> bookingService.createBooking(forCreate, 2L)
         );
         assertEquals("Item 5 is unavailable.", e.getMessage());
     }
