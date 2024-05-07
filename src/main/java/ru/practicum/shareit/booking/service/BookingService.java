@@ -11,6 +11,10 @@ public interface BookingService {
 
     void deleteBookingById(Long bookingId, Long userId);
 
+    List<Booking> getUserBookings(Long userId, State state, Integer from, Integer size);
+
+    List<Booking> getItemOwnerBookings(Long ownerId, State state, Integer from, Integer size);
+
     List<Booking> getUserBookings(Long userId, State state);
 
     List<Booking> getItemOwnerBookings(Long ownerId, State state);

@@ -6,11 +6,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.item.ItemController;
+import ru.practicum.shareit.request.controller.ItemRequestController;
 import ru.practicum.shareit.user.UserController;
 import java.util.Arrays;
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes = {ItemController.class, UserController.class, BookingController.class})
+@RestControllerAdvice(assignableTypes = {
+    ItemController.class, UserController.class, BookingController.class, ItemRequestController.class
+})
 @Slf4j
 public class ErrorHandler {
     @ExceptionHandler

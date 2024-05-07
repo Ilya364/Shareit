@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.State;
@@ -98,6 +100,14 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    private void validatePaginationParams(Integer from, Integer size) {
+        if (from < 0) {
+            throw new ValidationException("Parameter \"from\" must be greater than or equal to zero");
+        } else if (size < 0) {
+            throw new ValidationException("Parameter \"size\" must be greater than or equal to zero");
+        }
+    }
+
     @Override
     public Booking createBooking(Booking booking, Long bookerId) {
         User user = getUserById(bookerId);
@@ -124,9 +134,54 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public List<Booking> getUserBookings(Long bookerId, State state, Integer from, Integer size) {
+        User booker = getUserById(bookerId);
+        List<Booking> bookings;
+
+        validatePaginationParams(from, size);
+        Pageable page = PageRequest.of(from/size, size, byStartDescSorting);
+        if (state.equals(State.ALL)) {
+            bookings = new ArrayList<>(bookingRepository.findAllByBooker(booker, page));
+        } else {
+            try {
+                Status status = Status.valueOf(state.name());
+                bookings = bookingRepository.findAllByBookerAndStatus(booker, status, page);
+            } catch (IllegalArgumentException e) {
+                bookings = bookingRepository.findAllByBooker(booker, page).stream()
+                    .filter(getFilterByState(state))
+                    .collect(Collectors.toList());
+            }
+        }
+        return bookings;
+    }
+
+    @Override
+    public List<Booking> getItemOwnerBookings(Long itemOwnerId, State state, Integer from, Integer size) {
+        User itemOwner = getUserById(itemOwnerId);
+        List<Booking> bookings;
+
+        validatePaginationParams(from, size);
+        Pageable page = PageRequest.of(from/size, size, byStartDescSorting);
+        if (state.equals(State.ALL)) {
+            bookings = new ArrayList<>(bookingRepository.findAllByItemOwner(itemOwner, page));
+        } else {
+            try {
+                Status status = Status.valueOf(state.name());
+                bookings = bookingRepository.findAllByItemOwnerAndStatus(itemOwner, status, page);
+            } catch (IllegalArgumentException e) {
+                bookings = bookingRepository.findAllByItemOwner(itemOwner, page).stream()
+                    .filter(getFilterByState(state))
+                    .collect(Collectors.toList());
+            }
+        }
+        return bookings;
+    }
+
+    @Override
     public List<Booking> getUserBookings(Long bookerId, State state) {
         User booker = getUserById(bookerId);
         List<Booking> bookings;
+
         if (state.equals(State.ALL)) {
             bookings = new ArrayList<>(bookingRepository.findAllByBooker(booker, byStartDescSorting));
         } else {
@@ -143,9 +198,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getItemOwnerBookings(Long itemOwnerId, State state) {
-        User itemOwner = getUserById(itemOwnerId);
+    public List<Booking> getItemOwnerBookings(Long ownerId, State state) {
+        User itemOwner = getUserById(ownerId);
         List<Booking> bookings;
+
         if (state.equals(State.ALL)) {
             bookings = new ArrayList<>(bookingRepository.findAllByItemOwner(itemOwner, byStartDescSorting));
         } else {

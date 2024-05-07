@@ -44,7 +44,7 @@ public class BookingController {
         return toOutgoingDto(bookingService.getBookingById(bookingId, user));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{bookingId}")
     public void deleteBookingById(
         @PathVariable Long bookingId,
         @RequestHeader(USER_ID_HEADER) Long user
@@ -71,11 +71,16 @@ public class BookingController {
     @GetMapping
     public List<OutgoingBookingDto> getUserBookings(
         @RequestParam(value = "state", defaultValue = "ALL") String state,
+        @RequestParam(value = "from", required = false) Integer from,
+        @RequestParam(value = "size", required = false) Integer size,
         @RequestHeader(USER_ID_HEADER) Long user
-    ) {
+        ) {
         log.info("Request to receive user {}' Booking.", user);
         try {
-            return toOutgoingDtoList(bookingService.getUserBookings(user, State.valueOf(state)));
+            if (from == null || size == null) {
+                return toOutgoingDtoList(bookingService.getUserBookings(user, State.valueOf(state)));
+            }
+            return toOutgoingDtoList(bookingService.getUserBookings(user, State.valueOf(state), from, size));
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStateException(state);
         }
@@ -84,11 +89,16 @@ public class BookingController {
     @GetMapping("/owner")
     public List<OutgoingBookingDto> getItemOwnerBookings(
         @RequestParam(value = "state", defaultValue = "ALL") String state,
+        @RequestParam(value = "from", required = false) Integer from,
+        @RequestParam(value = "size", required = false) Integer size,
         @RequestHeader(USER_ID_HEADER) Long user
     ) {
         log.info("Request to receive item owner {}' Booking.", user);
         try {
-            return toOutgoingDtoList(bookingService.getItemOwnerBookings(user, State.valueOf(state)));
+            if (from == null || size == null) {
+                return toOutgoingDtoList(bookingService.getItemOwnerBookings(user, State.valueOf(state)));
+            }
+            return toOutgoingDtoList(bookingService.getItemOwnerBookings(user, State.valueOf(state), from, size));
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStateException(state);
         }

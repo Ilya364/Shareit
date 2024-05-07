@@ -11,6 +11,10 @@ import ru.practicum.shareit.item.dto.IncomingItemDto;
 import ru.practicum.shareit.item.dto.OutgoingItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
+import ru.practicum.shareit.request.service.ItemRequestService;
+
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,16 +28,24 @@ import static ru.practicum.shareit.item.dto.ItemDtoMapper.*;
 @Slf4j
 public class ItemController {
     private final ItemService itemService;
+    private final ItemRequestRepository itemRequestRepository;
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     public OutgoingItemDto createItem(
-            @Valid @RequestBody IncomingItemDto incomingItemDto,
+            @Valid @RequestBody IncomingItemDto dto,
             @RequestHeader(USER_ID_HEADER) Long owner
     ) {
         log.info("Request to create item.");
         try {
-            Item item = toItem(incomingItemDto);
+            ItemRequest request = null;
+            if (dto.getRequestId() != null) {
+                request = itemRequestRepository.findById(dto.getRequestId()).orElseThrow(
+                    () -> new NotFoundException(String.format("Item request %d not found.", dto.getRequestId()))
+                );
+            }
+            Item item = toItem(dto);
+            item.setRequest(request);
             return toOutgoingDto(itemService.createItem(item, owner));
         } catch (NoSuchElementException e) {
             throw new NotFoundException("User not found.");
