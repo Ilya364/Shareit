@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class ItemRequestDtoMapper {
-    public ItemRequest toItemRequest(IncomingItemRequestDto dto) {
+    public static ItemRequest toItemRequest(IncomingItemRequestDto dto) {
         return ItemRequest.builder()
             .description(dto.getDescription())
             .build();

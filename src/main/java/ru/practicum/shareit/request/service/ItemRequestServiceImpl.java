@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository requestRepository;
     private final ItemRepository itemRepository;
@@ -46,6 +48,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public OutgoingItemRequestDto createItemRequest(ItemRequest itemRequest, Long creatorId) {
         User creator = getUser(creatorId);
         itemRequest.setCreator(creator);
+        log.info("Requests of user {} created.", creatorId);
         return toOutgoingDto(requestRepository.save(itemRequest));
     }
 
@@ -65,6 +68,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .filter(itemResponse -> itemResponse.getRequestId().equals(request.getId()))
                 .collect(Collectors.toList()));
         }
+        log.info("Requests of user {} received.", userId);
         return dtos;
     }
 
@@ -83,6 +87,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .filter(itemResponse -> itemResponse.getRequestId().equals(dto.getId()))
                 .collect(Collectors.toList()))
         );
+        log.info("Requests of user {} received with pagination.", userId);
         return dtos;
     }
 
@@ -96,6 +101,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         List<OutgoingItemDto> responseDtos = ItemDtoMapper.toOutgoingDtoList(responses);
         OutgoingItemRequestDto dto = toOutgoingDto(request);
         dto.setItems(responseDtos);
+        log.info("Request {} received.", requestId);
         return dto;
     }
 
@@ -113,6 +119,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .filter(itemResponse -> itemResponse.getRequestId().equals(dto.getId()))
                 .collect(Collectors.toList()))
         );
+        log.info("All requests received.");
         return dtos;
     }
 }

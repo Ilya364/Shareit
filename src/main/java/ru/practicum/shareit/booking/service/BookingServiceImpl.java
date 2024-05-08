@@ -16,6 +16,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -139,7 +140,7 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings;
 
         validatePaginationParams(from, size);
-        Pageable page = PageRequest.of(from/size, size, byStartDescSorting);
+        Pageable page = PageRequest.of(from / size, size, byStartDescSorting);
         if (state.equals(State.ALL)) {
             bookings = new ArrayList<>(bookingRepository.findAllByBooker(booker, page));
         } else {
@@ -161,7 +162,7 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings;
 
         validatePaginationParams(from, size);
-        Pageable page = PageRequest.of(from/size, size, byStartDescSorting);
+        Pageable page = PageRequest.of(from / size, size, byStartDescSorting);
         if (state.equals(State.ALL)) {
             bookings = new ArrayList<>(bookingRepository.findAllByItemOwner(itemOwner, page));
         } else {

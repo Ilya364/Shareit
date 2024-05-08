@@ -21,10 +21,12 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.IncomingUserDto;
 import ru.practicum.shareit.user.model.User;
+
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -121,7 +123,9 @@ public class BookingControllerTest {
     @SneakyThrows
     void createNotFoundItemTest() {
         when(itemService.getItem(any(Long.class)))
-            .thenAnswer(invocationOnMock -> {throw new NotFoundException("");});
+            .thenAnswer(invocationOnMock -> {
+                throw new NotFoundException("");
+            });
 
         IncomingBookingDto booking = IncomingBookingDto.builder()
             .start(LocalDateTime.of(2024, 12, 12, 12, 12, 0))
@@ -130,9 +134,9 @@ public class BookingControllerTest {
             .build();
 
         mockMvc.perform(post("/bookings")
-            .content(objectMapper.writeValueAsString(booking))
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("X-Sharer-User-Id", 1))
+                .content(objectMapper.writeValueAsString(booking))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", 1))
             .andExpect(status().isNotFound());
     }
 

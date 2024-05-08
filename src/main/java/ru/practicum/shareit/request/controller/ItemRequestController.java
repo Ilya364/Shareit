@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.IncomingItemRequestDto;
 import ru.practicum.shareit.request.dto.OutgoingItemRequestDto;
@@ -14,6 +15,7 @@ import static ru.practicum.shareit.request.dto.ItemRequestDtoMapper.toItemReques
 @RestController
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
+@Slf4j
 public class ItemRequestController {
     private final ItemRequestService service;
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
@@ -23,6 +25,7 @@ public class ItemRequestController {
         @Valid @RequestBody IncomingItemRequestDto dto,
         @RequestHeader(USER_ID_HEADER) Long userId
     ) {
+        log.info("Request to create item request.");
         ItemRequest request = toItemRequest(dto);
         return service.createItemRequest(request, userId);
     }
@@ -31,6 +34,7 @@ public class ItemRequestController {
     public List<OutgoingItemRequestDto> getUserRequests(
         @RequestHeader(USER_ID_HEADER) Long userId
     ) {
+        log.info("Request to get item requests.");
         return service.getUserRequests(userId);
     }
 
@@ -40,6 +44,7 @@ public class ItemRequestController {
         @RequestParam(value = "size", required = false) Integer size,
         @RequestHeader(USER_ID_HEADER) Long userId
     ) {
+        log.info("Request get all item requests.");
         if (from == null || size == null) {
             return service.getAll(userId);
         }
@@ -51,6 +56,7 @@ public class ItemRequestController {
         @PathVariable("requestId") Long requestId,
         @RequestHeader(USER_ID_HEADER) Long userId
     ) {
+        log.info("Request to get item request.");
         return service.getItemRequest(requestId, userId);
     }
 }
