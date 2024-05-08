@@ -291,6 +291,7 @@ public class BookingServiceTest {
     void getBookingsOfItemOwnerByCurrentStateTest() {
         when(userRepository.findById(anyLong()))
             .thenReturn(Optional.of(user1));
+        booking.setStart(LocalDateTime.now().minusHours(1));
         when(bookingRepository.findAllByItemOwner(user1, Sort.by(DESC, "start")))
             .thenReturn(List.of(booking));
 

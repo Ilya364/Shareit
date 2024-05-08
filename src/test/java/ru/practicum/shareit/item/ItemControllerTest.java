@@ -11,7 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.comment.dto.IncomingCommentDto;
 import ru.practicum.shareit.comment.model.Comment;
+import ru.practicum.shareit.exception.BookingNoAccessException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.IncomingItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -19,10 +21,12 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
+
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
@@ -151,6 +155,58 @@ public class ItemControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .header("X-Sharer-User-Id", 1))
             .andExpect(status().isNotFound());
+    }
+
+    @SneakyThrows
+    @Test
+    void updateItemNoAccessTest() {
+        incomingItemDto = IncomingItemDto.builder()
+            .name("name")
+            .description("description")
+            .available(true)
+            .build();
+        item = ItemDtoMapper.toItem(incomingItemDto);
+
+        when(itemService.updateItem(any(Item.class), anyLong()))
+            .thenThrow(BookingNoAccessException.class);
+        when(itemService.getItem(anyLong()))
+            .thenAnswer(invocationOnMock -> {
+                throw new BookingNoAccessException("");
+            });
+
+        mvc.perform(patch("/items/1")
+                .content(objectMapper.writeValueAsString(incomingItemDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", 1))
+            .andExpect(status().isForbidden());
+    }
+
+    @SneakyThrows
+    @Test
+    void updateItemValidationFailedTest() {
+        incomingItemDto = IncomingItemDto.builder()
+            .name("name")
+            .description("description")
+            .available(true)
+            .build();
+        item = ItemDtoMapper.toItem(incomingItemDto);
+
+        when(itemService.updateItem(any(Item.class), anyLong()))
+            .thenThrow(BookingNoAccessException.class);
+        when(itemService.getItem(anyLong()))
+            .thenAnswer(invocationOnMock -> {
+                throw new ValidationException("");
+            });
+
+        mvc.perform(patch("/items/1")
+                .content(objectMapper.writeValueAsString(incomingItemDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Sharer-User-Id", 1))
+            .andExpect(status().isBadRequest());
     }
 
     @SneakyThrows

@@ -44,15 +44,6 @@ public class BookingController {
         return toOutgoingDto(bookingService.getBookingById(bookingId, user));
     }
 
-    @DeleteMapping("/{bookingId}")
-    public void deleteBookingById(
-        @PathVariable Long bookingId,
-        @RequestHeader(USER_ID_HEADER) Long user
-    ) {
-        log.info("Request to delete Booking {}.", bookingId);
-        bookingService.deleteBookingById(bookingId, user);
-    }
-
     @PatchMapping("/{bookingId}")
     public OutgoingBookingDto approveOrRejectBooking(
         @RequestParam("approved") Boolean approved,

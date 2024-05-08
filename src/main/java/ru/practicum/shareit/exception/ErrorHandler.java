@@ -46,13 +46,6 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleItemNotAvailableException(final ItemNotAvailableException e) {
-        log.error("Item not available: " + e.getMessage());
-        return Map.of("Item not available:", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleUnsupportedException(final UnsupportedStateException e) {
         log.error("Unknown state: " + e.getMessage());
         return Map.of("error", "Unknown state: " + e.getMessage());

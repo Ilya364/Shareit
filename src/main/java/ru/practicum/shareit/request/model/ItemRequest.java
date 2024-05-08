@@ -21,6 +21,6 @@ public class ItemRequest {
     private String description;
     @CreationTimestamp
     private LocalDateTime created;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private User creator;
 }

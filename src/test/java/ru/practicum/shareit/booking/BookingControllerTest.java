@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -138,19 +137,6 @@ public class BookingControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Sharer-User-Id", 1))
             .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @SneakyThrows
-    void deleteBookingByIdTest() {
-        mockMvc.perform(delete("/bookings/1")
-                .characterEncoding(StandardCharsets.UTF_8)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("X-Sharer-User-Id", 1))
-            .andExpect(status().isOk());
-        Mockito.verify(bookingService, Mockito.times(1))
-            .deleteBookingById(1L, 1L);
     }
 
     @Test

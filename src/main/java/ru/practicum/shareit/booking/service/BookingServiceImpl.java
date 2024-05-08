@@ -129,12 +129,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void deleteBookingById(Long bookingId, Long userId) {
-        isBooker(userId, bookingId);
-        bookingRepository.deleteById(bookingId);
-    }
-
-    @Override
     public List<Booking> getUserBookings(Long bookerId, State state, Integer from, Integer size) {
         User booker = getUserById(bookerId);
         List<Booking> bookings;

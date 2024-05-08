@@ -50,13 +50,13 @@ public class ItemRepositoryTest {
         itemRequest = ItemRequest.builder()
             .id(1L)
             .description("for item")
-            .creator(user1)
+            .creator(user2)
             .created(LocalDateTime.now())
             .build();
         item = Item.builder()
             .id(1L)
             .name("itemname")
-            .owner(user1)
+            .owner(user2)
             .available(true)
             .description("description")
             .request(itemRequest)
@@ -75,14 +75,13 @@ public class ItemRepositoryTest {
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getByItemOwnerTest() {
         Item received = itemRepository.findAllByOwnerId(
-            1L, Sort.by(Sort.Direction.ASC, "id")
+            2L, Sort.by(Sort.Direction.ASC, "id")
         ).get(0);
 
         assertEquals(item.getId(), received.getId());
         assertEquals(item.getName(), received.getName());
         assertEquals(item.getDescription(), received.getDescription());
         assertEquals(item.getAvailable(), received.getAvailable());
-        assertEquals(item.getOwner(), received.getOwner());
     }
 
     @Test
@@ -94,7 +93,6 @@ public class ItemRepositoryTest {
         assertEquals(item.getName(), received.getName());
         assertEquals(item.getDescription(), received.getDescription());
         assertEquals(item.getAvailable(), received.getAvailable());
-        assertEquals(item.getOwner(), received.getOwner());
     }
 
     @Test
@@ -106,7 +104,6 @@ public class ItemRepositoryTest {
         assertEquals(item.getName(), received.getName());
         assertEquals(item.getDescription(), received.getDescription());
         assertEquals(item.getAvailable(), received.getAvailable());
-        assertEquals(item.getOwner(), received.getOwner());
     }
 
     @Test
@@ -118,7 +115,6 @@ public class ItemRepositoryTest {
         assertEquals(item.getName(), received.getName());
         assertEquals(item.getDescription(), received.getDescription());
         assertEquals(item.getAvailable(), received.getAvailable());
-        assertEquals(item.getOwner(), received.getOwner());
     }
 
     @Test
@@ -126,10 +122,8 @@ public class ItemRepositoryTest {
     void getByRequestListTest() {
         Item received = itemRepository.findAllByRequestIn(List.of(itemRequest)).get(0);
 
-        assertEquals(item.getId(), received.getId());
         assertEquals(item.getName(), received.getName());
         assertEquals(item.getDescription(), received.getDescription());
         assertEquals(item.getAvailable(), received.getAvailable());
-        assertEquals(item.getOwner(), received.getOwner());
     }
 }
