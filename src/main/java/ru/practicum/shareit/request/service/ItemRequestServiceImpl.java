@@ -16,12 +16,16 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import static ru.practicum.shareit.request.dto.ItemRequestDtoMapper.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.practicum.shareit.request.dto.ItemRequestDtoMapper.toOutgoingDto;
+import static ru.practicum.shareit.request.dto.ItemRequestDtoMapper.toOutgoingDtoList;
+
 @Service
+@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class ItemRequestServiceImpl implements ItemRequestService {
@@ -63,7 +67,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         List<OutgoingItemDto> responseDtos = ItemDtoMapper.toOutgoingDtoList(responses);
         List<OutgoingItemRequestDto> dtos = toOutgoingDtoList(requests);
 
-        for (OutgoingItemRequestDto request: dtos) {
+        for (OutgoingItemRequestDto request : dtos) {
             request.setItems(responseDtos.stream()
                 .filter(itemResponse -> itemResponse.getRequestId().equals(request.getId()))
                 .collect(Collectors.toList()));
@@ -75,6 +79,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<OutgoingItemRequestDto> getPaginatedRequests(Long userId, Integer from, Integer size) {
         Sort sortByCreationTime = Sort.by(Sort.Direction.DESC, "created");
+
         Pageable page = PageRequest.of(from, size, sortByCreationTime);
 
         List<ItemRequest> requests = requestRepository.findAllByCreatorIdNot(userId, page);

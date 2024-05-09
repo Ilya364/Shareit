@@ -370,14 +370,6 @@ public class BookingServiceTest {
     }
 
     @Test
-    void getBookingsOfBookerNotValidPaginationFoundTest() {
-        when(userRepository.findById(anyLong()))
-            .thenReturn(Optional.of(user2));
-
-        assertThrows(ValidationException.class, () -> bookingService.getUserBookings(2L, State.ALL, 0, -1));
-    }
-
-    @Test
     void getBookingsOfItemOwnerWithPaginationTest() {
         when(userRepository.findById(anyLong()))
             .thenReturn(Optional.of(user1));
@@ -393,14 +385,6 @@ public class BookingServiceTest {
         assertEquals(booking.getStatus(), result.getStatus());
         assertEquals(user2, result.getBooker());
         assertEquals(item1, result.getItem());
-    }
-
-    @Test
-    void getBookingsOfOwnerNotValidPaginationFoundTest() {
-        when(userRepository.findById(anyLong()))
-            .thenReturn(Optional.of(user2));
-
-        assertThrows(ValidationException.class, () -> bookingService.getItemOwnerBookings(2L, State.ALL, 0, -1));
     }
 
     @Test

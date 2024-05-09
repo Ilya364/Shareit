@@ -13,11 +13,16 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
+
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.List;
-import static ru.practicum.shareit.comment.dto.CommentDtoMapper.*;
-import static ru.practicum.shareit.item.dto.ItemDtoMapper.*;
+
+import static ru.practicum.shareit.comment.dto.CommentDtoMapper.toComment;
+import static ru.practicum.shareit.comment.dto.CommentDtoMapper.toOutgoingDto;
+import static ru.practicum.shareit.item.dto.ItemDtoMapper.partialMapToItem;
+import static ru.practicum.shareit.item.dto.ItemDtoMapper.toItem;
+import static ru.practicum.shareit.item.dto.ItemDtoMapper.toOutgoingDto;
+import static ru.practicum.shareit.item.dto.ItemDtoMapper.toOutgoingDtoList;
 
 @RestController
 @RequestMapping("/items")
@@ -30,8 +35,8 @@ public class ItemController {
 
     @PostMapping
     public OutgoingItemDto createItem(
-            @Valid @RequestBody IncomingItemDto dto,
-            @RequestHeader(USER_ID_HEADER) Long owner
+        @Valid @RequestBody IncomingItemDto dto,
+        @RequestHeader(USER_ID_HEADER) Long owner
     ) {
         ItemRequest request = null;
         if (dto.getRequestId() != null) {
@@ -46,9 +51,9 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public OutgoingItemDto updateItem(
-            @RequestBody IncomingItemDto incomingItemDto,
-            @PathVariable Long itemId,
-            @RequestHeader(USER_ID_HEADER) Long user
+        @RequestBody IncomingItemDto incomingItemDto,
+        @PathVariable Long itemId,
+        @RequestHeader(USER_ID_HEADER) Long user
     ) {
         log.info("Request to update item {}.", itemId);
         Item item = itemService.getItem(itemId);
@@ -89,7 +94,6 @@ public class ItemController {
         @PathVariable Long itemId,
         @RequestHeader(USER_ID_HEADER) Long userId
     ) {
-        incomingCommentDto.setCreated(LocalDateTime.now());
         log.info("Request to create comment.");
         Comment comment = toComment(incomingCommentDto);
         return toOutgoingDto(itemService.createComment(comment, itemId, userId));

@@ -1,16 +1,19 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NonUniqueEmailException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import javax.validation.ConstraintViolationException;
+
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
@@ -19,7 +22,7 @@ public class UserServiceImpl implements UserService {
     public User createUser(User user) {
         try {
             return repository.save(user);
-        } catch (ConstraintViolationException e) {
+        } catch (DataIntegrityViolationException e) {
             throw new NonUniqueEmailException(String.format("Email %s is not unique.", user.getEmail()));
         }
     }

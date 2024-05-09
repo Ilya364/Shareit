@@ -8,6 +8,7 @@ import ru.practicum.shareit.request.dto.OutgoingItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import javax.validation.Valid;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 import static ru.practicum.shareit.request.dto.ItemRequestDtoMapper.toItemRequest;
@@ -40,8 +41,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<OutgoingItemRequestDto> getPaginatedRequests(
-        @RequestParam(value = "from", required = false) Integer from,
-        @RequestParam(value = "size", required = false) Integer size,
+        @RequestParam(value = "from", required = false) @PositiveOrZero Integer from,
+        @RequestParam(value = "size", required = false) @PositiveOrZero Integer size,
         @RequestHeader(USER_ID_HEADER) Long userId
     ) {
         log.info("Request get all item requests.");
