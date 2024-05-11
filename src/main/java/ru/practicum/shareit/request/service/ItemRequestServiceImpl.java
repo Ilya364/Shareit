@@ -21,8 +21,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.request.dto.ItemRequestDtoMapper.toOutgoingDto;
-import static ru.practicum.shareit.request.dto.ItemRequestDtoMapper.toOutgoingDtoList;
+import static ru.practicum.shareit.request.dto.ItemRequestDtoMapper.*;
 
 @Service
 @Transactional

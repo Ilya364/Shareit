@@ -11,7 +11,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
-import static ru.practicum.shareit.request.dto.ItemRequestDtoMapper.toItemRequest;
+import static ru.practicum.shareit.request.dto.ItemRequestDtoMapper.*;
 
 @RestController
 @RequestMapping(path = "/requests")

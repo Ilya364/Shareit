@@ -3,7 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.comment.dto.IncomingCommentDto;
+import ru.practicum.shareit.comment.dto.*;
 import ru.practicum.shareit.comment.dto.OutgoingCommentDto;
 import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -17,12 +17,8 @@ import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import javax.validation.Valid;
 import java.util.List;
 
-import static ru.practicum.shareit.comment.dto.CommentDtoMapper.toComment;
-import static ru.practicum.shareit.comment.dto.CommentDtoMapper.toOutgoingDto;
-import static ru.practicum.shareit.item.dto.ItemDtoMapper.partialMapToItem;
-import static ru.practicum.shareit.item.dto.ItemDtoMapper.toItem;
-import static ru.practicum.shareit.item.dto.ItemDtoMapper.toOutgoingDto;
-import static ru.practicum.shareit.item.dto.ItemDtoMapper.toOutgoingDtoList;
+import static ru.practicum.shareit.comment.dto.CommentDtoMapper.*;
+import static ru.practicum.shareit.item.dto.ItemDtoMapper.*;
 
 @RestController
 @RequestMapping("/items")
