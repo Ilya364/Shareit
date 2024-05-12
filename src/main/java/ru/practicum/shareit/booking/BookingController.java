@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.IncomingBookingDto;
 import ru.practicum.shareit.booking.dto.OutgoingBookingDto;
@@ -10,11 +11,15 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.UnsupportedStateException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+
 import javax.validation.Valid;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
+
 import static ru.practicum.shareit.booking.dto.BookingDtoMapper.*;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
@@ -44,15 +49,6 @@ public class BookingController {
         return toOutgoingDto(bookingService.getBookingById(bookingId, user));
     }
 
-    @DeleteMapping
-    public void deleteBookingById(
-        @PathVariable Long bookingId,
-        @RequestHeader(USER_ID_HEADER) Long user
-    ) {
-        log.info("Request to delete Booking {}.", bookingId);
-        bookingService.deleteBookingById(bookingId, user);
-    }
-
     @PatchMapping("/{bookingId}")
     public OutgoingBookingDto approveOrRejectBooking(
         @RequestParam("approved") Boolean approved,
@@ -71,11 +67,16 @@ public class BookingController {
     @GetMapping
     public List<OutgoingBookingDto> getUserBookings(
         @RequestParam(value = "state", defaultValue = "ALL") String state,
+        @RequestParam(value = "from", required = false) @PositiveOrZero Integer from,
+        @RequestParam(value = "size", required = false) @PositiveOrZero Integer size,
         @RequestHeader(USER_ID_HEADER) Long user
     ) {
         log.info("Request to receive user {}' Booking.", user);
         try {
-            return toOutgoingDtoList(bookingService.getUserBookings(user, State.valueOf(state)));
+            if (from == null || size == null) {
+                return toOutgoingDtoList(bookingService.getUserBookings(user, State.valueOf(state)));
+            }
+            return toOutgoingDtoList(bookingService.getUserBookings(user, State.valueOf(state), from, size));
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStateException(state);
         }
@@ -84,11 +85,16 @@ public class BookingController {
     @GetMapping("/owner")
     public List<OutgoingBookingDto> getItemOwnerBookings(
         @RequestParam(value = "state", defaultValue = "ALL") String state,
+        @RequestParam(value = "from", required = false) @PositiveOrZero Integer from,
+        @RequestParam(value = "size", required = false) @PositiveOrZero Integer size,
         @RequestHeader(USER_ID_HEADER) Long user
     ) {
         log.info("Request to receive item owner {}' Booking.", user);
         try {
-            return toOutgoingDtoList(bookingService.getItemOwnerBookings(user, State.valueOf(state)));
+            if (from == null || size == null) {
+                return toOutgoingDtoList(bookingService.getItemOwnerBookings(user, State.valueOf(state)));
+            }
+            return toOutgoingDtoList(bookingService.getItemOwnerBookings(user, State.valueOf(state), from, size));
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStateException(state);
         }

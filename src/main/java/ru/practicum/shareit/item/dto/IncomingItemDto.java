@@ -16,4 +16,5 @@ public class IncomingItemDto {
     @NotNull
     private Boolean available;
     private Long owner;
+    private Long requestId;
 }

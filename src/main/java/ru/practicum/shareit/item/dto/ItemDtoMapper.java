@@ -10,12 +10,16 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class ItemDtoMapper {
     public OutgoingItemDto toOutgoingDto(Item item) {
-        return OutgoingItemDto.builder()
+        OutgoingItemDto dto = OutgoingItemDto.builder()
             .id(item.getId())
             .name(item.getName())
             .description(item.getDescription())
             .available(item.getAvailable())
             .build();
+        if (item.getRequest() != null) {
+            dto.setRequestId(item.getRequest().getId());
+        }
+        return dto;
     }
 
     public Item toItem(IncomingItemDto dto) {

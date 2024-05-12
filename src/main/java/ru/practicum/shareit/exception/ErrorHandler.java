@@ -6,11 +6,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.item.ItemController;
+import ru.practicum.shareit.request.controller.ItemRequestController;
 import ru.practicum.shareit.user.UserController;
 import java.util.Arrays;
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes = {ItemController.class, UserController.class, BookingController.class})
+@RestControllerAdvice(assignableTypes = {
+    ItemController.class, UserController.class, BookingController.class, ItemRequestController.class
+})
 @Slf4j
 public class ErrorHandler {
     @ExceptionHandler
@@ -39,13 +42,6 @@ public class ErrorHandler {
     public Map<String, String> handleValidationException(final ValidationException e) {
         log.error("The request was not validated: " + e.getMessage());
         return Map.of("The request was not validated:", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleItemNotAvailableException(final ItemNotAvailableException e) {
-        log.error("Item not available: " + e.getMessage());
-        return Map.of("Item not available:", e.getMessage());
     }
 
     @ExceptionHandler

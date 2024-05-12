@@ -10,13 +10,23 @@ CREATE TABLE IF NOT EXISTS users (
     UNIQUE(email)
 );
 
+CREATE TABLE IF NOT EXISTS item_request (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    description VARCHAR(100),
+    created timestamp,
+    creator_id BIGINT,
+    CONSTRAINT fk_request_to_users FOREIGN KEY(creator_id) REFERENCES users(id)
+);
+
 CREATE TABLE IF NOT EXISTS item (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(100),
     description VARCHAR(100),
     available BOOLEAN,
     owner_id BIGINT,
-    CONSTRAINT fk_items_to_users FOREIGN KEY(owner_id) REFERENCES users(id)
+    request_id BIGINT,
+    CONSTRAINT fk_items_to_users FOREIGN KEY(owner_id) REFERENCES users(id),
+    CONSTRAINT fk_items_to_request FOREIGN KEY(request_id) REFERENCES item_request(id)
 );
 
 CREATE TABLE IF NOT EXISTS comment (
