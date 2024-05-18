@@ -10,7 +10,6 @@ import ru.practicim.shareit.booking.dto.BookingDto;
 import ru.practicim.shareit.booking.dto.State;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -27,7 +26,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<Object> create(
-        @RequestHeader("X-Sharer-User-Id") long userId,
+        @RequestHeader(USER_ID_HEADER) long userId,
         @RequestBody @Valid BookingDto requestDto
     ) {
         log.info("Creating booking {} by userId={}", requestDto, userId);
@@ -46,7 +45,7 @@ public class BookingController {
 
     @GetMapping("/{bookingId}")
     public ResponseEntity<Object> getById(
-        @RequestHeader("X-Sharer-User-Id") long userId,
+        @RequestHeader(USER_ID_HEADER) long userId,
         @PathVariable Long bookingId
     ) {
         log.info("Get booking {} by userId={}", bookingId, userId);
@@ -69,14 +68,11 @@ public class BookingController {
 
     @GetMapping
     public ResponseEntity<Object> getBookingsByUser(
-        @RequestHeader("X-Sharer-User-Id") long userId,
+        @RequestHeader(USER_ID_HEADER) long userId,
         @RequestParam(name = "state", defaultValue = "all") String stateParam,
         @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
         @Positive @RequestParam(defaultValue = "10") Integer size
     ) {
-        if (from < 0) {
-            throw new ValidationException();
-        }
         State state = State.from(stateParam)
             .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
         log.info("Get booking with state {}, userId={}, from={}, size={}", stateParam, userId, from, size);
