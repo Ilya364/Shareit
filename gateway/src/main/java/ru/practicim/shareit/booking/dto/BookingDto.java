@@ -2,14 +2,12 @@ package ru.practicim.shareit.booking.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
-@Validated
 public class BookingDto {
     private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     @NotNull

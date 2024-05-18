@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicim.shareit.request.dto.ItemRequestDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 @RestController
 @RequestMapping(path = "/requests")
@@ -35,8 +37,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getPaginatedRequests(
-        @RequestParam(value = "from", required = false) Integer from,
-        @RequestParam(value = "size", required = false) Integer size,
+        @PositiveOrZero @RequestParam(value = "from", required = false) Integer from,
+        @Positive @RequestParam(value = "size", required = false) Integer size,
         @RequestHeader(USER_ID_HEADER) Long userId
     ) {
         log.info("Request get all item requests.");
